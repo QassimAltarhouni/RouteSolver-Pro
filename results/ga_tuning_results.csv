@@ -1,0 +1,5 @@
+Instance,Optimal,Configuration,Best,Worst,Average,Std
+A-n32-k5.vrp,784.0,"{'population_size': 30, 'generations': 200, 'crossover_prob': 0.8, 'mutation_prob': 0.1, 'mutation_type': 'swap', 'crossover_type': 'OX'}",1065.8100925832116,1277.7621447228667,1143.5379215695941,66.18240500854026
+A-n32-k5.vrp,784.0,"{'population_size': 50, 'generations': 500, 'crossover_prob': 0.9, 'mutation_prob': 0.2, 'mutation_type': 'inversion', 'crossover_type': 'PMX'}",886.6468673710791,1041.8391490201914,963.6431618321969,46.798790137998154
+A-n32-k5.vrp,784.0,"{'population_size': 100, 'generations': 300, 'crossover_prob': 0.7, 'mutation_prob': 0.05, 'mutation_type': 'swap', 'crossover_type': 'PMX'}",861.084632607801,1033.4638368290257,969.6673896866778,47.717089838352756
+A-n32-k5.vrp,784.0,"{'population_size': 60, 'generations': 400, 'crossover_prob': 0.75, 'mutation_prob': 0.15, 'mutation_type': 'inversion', 'crossover_type': 'OX'}",918.2608522423088,1106.7737875097048,1002.8702153009253,51.596337531994024

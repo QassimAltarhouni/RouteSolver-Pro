@@ -50,43 +50,41 @@ class TabuSearchCVRP:
                 neighbors.append((i, j, neighbor))
         return neighbors
 
-    def run(self):
-        # Step 4: Execute the Tabu Search
+    def run(self, runs=1):
+        distances = []
 
-        # Initialize solution with random shuffle of customers (excluding depot)
-        customer_ids = list(self.cvrp.locations.keys())[1:]
-        current_solution = customer_ids.copy()
-        random.shuffle(current_solution)
+        for _ in range(runs):
+            customer_ids = list(self.cvrp.locations.keys())[1:]
+            current_solution = customer_ids.copy()
+            random.shuffle(current_solution)
 
-        # Set best solution as the initial one
-        best_solution = current_solution.copy()
-        best_cost = self.evaluate_route(best_solution)
+            best_solution = current_solution.copy()
+            best_cost = self.evaluate_route(best_solution)
+            tabu_list = []
 
-        tabu_list = []  # Initialize empty tabu list
+            for _ in range(self.max_iterations):
+                neighbors = self.generate_neighbors(current_solution)
+                neighbors = sorted(neighbors, key=lambda x: self.evaluate_route(x[2]))
 
-        for iteration in range(self.max_iterations):
-            # Step 5: Generate and sort neighbors by cost (lowest first)
-            neighbors = self.generate_neighbors(current_solution)
-            neighbors = sorted(neighbors, key=lambda x: self.evaluate_route(x[2]))
+                for i, j, neighbor in neighbors:
+                    move = (i, j)
+                    cost = self.evaluate_route(neighbor)
+                    if move not in tabu_list or cost < best_cost:
+                        current_solution = neighbor
+                        if cost < best_cost:
+                            best_solution = neighbor
+                            best_cost = cost
+                        tabu_list.append(move)
+                        if len(tabu_list) > self.tabu_tenure:
+                            tabu_list.pop(0)
+                        break
 
-            for i, j, neighbor in neighbors:
-                move = (i, j)  # This is the swap move
-                cost = self.evaluate_route(neighbor)
+            distances.append(best_cost)
 
-                # Step 6: Choose best allowed move (not in tabu or better than current best)
-                if move not in tabu_list or cost < best_cost:
-                    current_solution = neighbor
+        return {
+            "best": min(distances),
+            "worst": max(distances),
+            "avg": np.mean(distances),
+            "std": np.std(distances)
+        }
 
-                    # Step 7: Update best solution if found
-                    if cost < best_cost:
-                        best_solution = neighbor
-                        best_cost = cost
-
-                    # Step 8: Add move to tabu list
-                    tabu_list.append(move)
-                    if len(tabu_list) > self.tabu_tenure:
-                        tabu_list.pop(0)  # Maintain tabu list size
-                    break  # Apply only one move per iteration
-
-        # Step 9: Return best found solution and its cost
-        return best_solution, best_cost
