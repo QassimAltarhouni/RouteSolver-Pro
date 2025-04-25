@@ -1,6 +1,5 @@
 import os
 import csv
-import numpy as np
 from cvrp_solver import CVRPData
 from greedy_algorithm import GreedyCVRP
 from random_algorithm import RandomSearchCVRP
@@ -66,7 +65,7 @@ for file_name in vrp_files:
     ga_solver = GeneticAlgorithmCVRP(
         cvrp_data,
         population_size=50,
-        generations=10,
+        generations=500,
         crossover_prob=0.8,
         mutation_prob=0.1
     )
