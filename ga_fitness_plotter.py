@@ -18,7 +18,7 @@ configs = [
     {"mutation": "inversion", "crossover": "PMX"},
 ]
 
-generations = 200
+generations = 500
 population_size = 50
 
 for cfg in configs:
