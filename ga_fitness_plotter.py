@@ -9,7 +9,7 @@ def smooth(values, window=5):
 
 # Load data
 cvrp_data = CVRPData("data/A-n32-k5.vrp")
-optimal_cost = 1140
+optimal_cost = 784  # Replace with correct optimal cost if needed
 
 # Configs to compare
 configs = [
@@ -20,7 +20,7 @@ configs = [
 ]
 
 generations = 500
-population_size = 5
+population_size = 50  # You wrote 5 by mistake? Normally 50 or 100.
 
 for cfg in configs:
     ga = GeneticAlgorithmCVRP(
@@ -35,12 +35,15 @@ for cfg in configs:
 
     population = ga.initialize_population()
 
-    min_fitness, mean_fitness = [], []
+    min_fitness, max_fitness, mean_fitness, std_fitness = [], [], [], []
 
     for _ in range(generations):
         fitnesses = [ga.evaluate_route(ind) for ind in population]
+
         min_fitness.append(min(fitnesses))
+        max_fitness.append(max(fitnesses))
         mean_fitness.append(np.mean(fitnesses))
+        std_fitness.append(np.std(fitnesses))
 
         new_population = []
         for _ in range(population_size):
@@ -55,16 +58,19 @@ for cfg in configs:
     smooth_window = 5
     gens = np.arange(1, generations + 1)
     min_sm = smooth(min_fitness, smooth_window)
+    max_sm = smooth(max_fitness, smooth_window)
     mean_sm = smooth(mean_fitness, smooth_window)
+    std_sm = smooth(std_fitness, smooth_window)
     gens_sm = gens[smooth_window - 1:]  # Align with smoothed data
 
-    # Plot
+    # Plot Best, Mean, Worst, and Optimal
     plt.figure(figsize=(10, 6))
     plt.plot(gens_sm, min_sm, label="Best (Min)", color="blue", linewidth=2)
+    plt.plot(gens_sm, max_sm, label="Worst (Max)", color="red", linewidth=2)
     plt.plot(gens_sm, mean_sm, label="Mean", color="green", linewidth=2, alpha=0.6)
     plt.axhline(y=optimal_cost, color='black', linestyle='--', label='Optimal Cost')
 
-    plt.title(f"GA Route Cost over Generations\nMutation = {cfg['mutation'].capitalize()}, Crossover = {cfg['crossover']}")
+    plt.title(f"GA Fitness Over Generations\nMutation = {cfg['mutation'].capitalize()}, Crossover = {cfg['crossover']}")
     plt.xlabel("Generation", fontsize=12)
     plt.ylabel("Route Cost", fontsize=12)
     plt.xticks(fontsize=10)
@@ -74,3 +80,10 @@ for cfg in configs:
     plt.tight_layout()
     plt.savefig(f"ga_fitness_plot_{cfg['mutation']}_{cfg['crossover']}.png", dpi=300)
     plt.show()
+
+    # Optional: print final GA stats after last generation
+    print(f"\n✅ Config: Mutation = {cfg['mutation']}, Crossover = {cfg['crossover']}")
+    print(f"GA Best (Min): {min_fitness[-1]:.2f}")
+    print(f"GA Worst (Max): {max_fitness[-1]:.2f}")
+    print(f"GA Avg (Mean): {mean_fitness[-1]:.2f}")
+    print(f"GA Std Dev   : {std_fitness[-1]:.2f}")
