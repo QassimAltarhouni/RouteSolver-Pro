@@ -1,71 +1,81 @@
-# tabu_algorithm.py
 import random
 import numpy as np
 
 class TabuSearchCVRP:
+    """
+    Tabu Search algorithm for CVRP: improves routes using a tabu list to escape local minima.
+    """
     def __init__(self, cvrp_data, tabu_tenure=10, max_iterations=100):
-        # Step 1: Initialize Tabu Search parameters
-        self.cvrp = cvrp_data  # CVRP problem instance
-        num_customers = len(cvrp_data.locations) - 1  # Exclude depot
-
-        # Dynamically determine tabu_tenure if not provided
-        self.tabu_tenure = tabu_tenure if tabu_tenure is not None else max(5, int(0.01 * num_customers))
-
-
-        self.max_iterations = max_iterations  # Number of search iterations
-        self.tabu_list = []  # List of forbidden moves
+        """
+        Initialize Tabu Search parameters.
+        :param cvrp_data: An instance of CVRPData.
+        :param tabu_tenure: Number of moves to keep in tabu list.
+        :param max_iterations: Max number of iterations per run.
+        """
+        self.cvrp = cvrp_data
+        self.tabu_tenure = tabu_tenure
+        self.max_iterations = max_iterations
 
     def evaluate_route(self, route):
-        # Step 2: Calculate total travel distance of a route
-        total_distance = 0
+        """
+        Calculate total distance of a CVRP route.
+        :param route: List of customer node IDs.
+        """
+        total_distance = 0.0
         current_capacity = 0
-        prev_location = 1  # Start at depot (ID 1)
+        prev_location = 1  # Start at depot
 
         for customer in route:
             demand = self.cvrp.demands[customer]
-
             if current_capacity + demand > self.cvrp.capacity:
-                # If adding this customer exceeds capacity, return to depot
+                # Return to depot before continuing
                 total_distance += self.cvrp.distance_matrix[prev_location][1]
                 prev_location = 1
                 current_capacity = 0
 
-            # Move to customer and accumulate distance and demand
             total_distance += self.cvrp.distance_matrix[prev_location][customer]
             current_capacity += demand
             prev_location = customer
 
-        # After last customer, return to depot
+        # Return to depot after last customer
         total_distance += self.cvrp.distance_matrix[prev_location][1]
         return total_distance
 
     def generate_neighbors(self, route):
-        # Step 3: Generate neighbor solutions by swapping two customer positions
+        """
+        Generate neighbor solutions by swapping every pair of customers.
+        :param route: Current route (list of customers).
+        :return: List of (i, j, neighbor_route) tuples.
+        """
         neighbors = []
         n = len(route)
         for i in range(n):
             for j in range(i + 1, n):
                 neighbor = route.copy()
-                neighbor[i], neighbor[j] = neighbor[j], neighbor[i]  # Swap
+                neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
                 neighbors.append((i, j, neighbor))
         return neighbors
 
     def run(self, runs=1):
-        distances = []
+        """
+        Execute Tabu Search and return distance stats.
+        :param runs: Number of independent runs.
+        :return: Dict with 'best', 'worst', 'avg', 'std' distances.
+        """
+        best_costs = []
+        customer_ids = list(self.cvrp.locations.keys())[1:]  # exclude depot
 
         for _ in range(runs):
-            customer_ids = list(self.cvrp.locations.keys())[1:]
             current_solution = customer_ids.copy()
             random.shuffle(current_solution)
-
             best_solution = current_solution.copy()
             best_cost = self.evaluate_route(best_solution)
             tabu_list = []
 
             for _ in range(self.max_iterations):
                 neighbors = self.generate_neighbors(current_solution)
-                neighbors = sorted(neighbors, key=lambda x: self.evaluate_route(x[2]))
-
+                # sort neighbors by distance (ascending)
+                neighbors.sort(key=lambda x: self.evaluate_route(x[2]))
                 for i, j, neighbor in neighbors:
                     move = (i, j)
                     cost = self.evaluate_route(neighbor)
@@ -79,12 +89,13 @@ class TabuSearchCVRP:
                             tabu_list.pop(0)
                         break
 
-            distances.append(best_cost)
+            best_costs.append(best_cost)
 
+        arr = np.array(best_costs)
         return {
-            "best": min(distances),
-            "worst": max(distances),
-            "avg": np.mean(distances),
-            "std": np.std(distances)
+            "best": float(arr.min()),
+            "worst": float(arr.max()),
+            "avg": float(arr.mean()),
+            "std": float(arr.std())
         }
 
