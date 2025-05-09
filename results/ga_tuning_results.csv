@@ -1,9 +1,0 @@
-Instance,Optimal,Configuration,Best,Worst,Avg,Std
-A-n32-k5.vrp,784.0,"{'population_size': 30, 'generations': 200, 'crossover_prob': 0.8, 'mutation_prob': 0.1, 'mutation_type': 'swap', 'crossover_type': 'OX'}",992.1981654148154,1220.2765763596633,1133.956124229031,68.39504128713023
-A-n32-k5.vrp,784.0,"{'population_size': 50, 'generations': 500, 'crossover_prob': 0.9, 'mutation_prob': 0.2, 'mutation_type': 'inversion', 'crossover_type': 'PMX'}",860.2231114085305,1046.294653576587,953.591533192827,61.60797030566244
-A-n32-k5.vrp,784.0,"{'population_size': 100, 'generations': 300, 'crossover_prob': 0.7, 'mutation_prob': 0.05, 'mutation_type': 'swap', 'crossover_type': 'PMX'}",914.4469843363779,1050.9087461413967,994.319711944798,43.84309483181667
-A-n32-k5.vrp,784.0,"{'population_size': 60, 'generations': 400, 'crossover_prob': 0.75, 'mutation_prob': 0.15, 'mutation_type': 'inversion', 'crossover_type': 'OX'}",869.681990883193,1184.4058506461138,996.9706923989027,79.67868968531108
-A-n60-k9.vrp,1354.0,"{'population_size': 30, 'generations': 200, 'crossover_prob': 0.8, 'mutation_prob': 0.1, 'mutation_type': 'swap', 'crossover_type': 'OX'}",2085.026957816495,2348.093434341732,2258.165920103561,72.10128320187107
-A-n60-k9.vrp,1354.0,"{'population_size': 50, 'generations': 500, 'crossover_prob': 0.9, 'mutation_prob': 0.2, 'mutation_type': 'inversion', 'crossover_type': 'PMX'}",1816.5719729722769,2388.3141565067936,1956.6776939875267,152.69350331689932
-A-n60-k9.vrp,1354.0,"{'population_size': 100, 'generations': 300, 'crossover_prob': 0.7, 'mutation_prob': 0.05, 'mutation_type': 'swap', 'crossover_type': 'PMX'}",1866.740618065122,2099.2039507027202,1987.846425350656,75.76231153080433
-A-n60-k9.vrp,1354.0,"{'population_size': 60, 'generations': 400, 'crossover_prob': 0.75, 'mutation_prob': 0.15, 'mutation_type': 'inversion', 'crossover_type': 'OX'}",1823.014587742081,1986.8206493872378,1906.3075971874089,43.37851089227776
