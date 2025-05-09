@@ -39,9 +39,9 @@ def main():
 
         # Step 1: Tune Population Size
         step1_configs = [
-            {"population_size": 30, "generations": 5000, "mutation_type": "swap", "crossover_type": "OX"},
-            {"population_size": 50, "generations": 5000, "mutation_type": "swap", "crossover_type": "OX"},
-            {"population_size": 100, "generations": 5000, "mutation_type": "swap", "crossover_type": "OX"}
+            {"population_size": 30, "generations": 50000, "mutation_type": "swap", "crossover_type": "OX"},
+            {"population_size": 50, "generations": 50000, "mutation_type": "swap", "crossover_type": "OX"},
+            {"population_size": 100, "generations": 50000, "mutation_type": "swap", "crossover_type": "OX"}
         ]
         step = 1
         best_config = None
