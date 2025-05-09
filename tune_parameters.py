@@ -50,7 +50,7 @@ def main():
         for config in step1_configs:
             solver = GeneticAlgorithmCVRP(cvrp_data,
                                           population_size=config["population_size"],
-                                          crossover_prob=0.8,
+                                          crossover_prob=0.7,
                                           mutation_prob=0.1,
                                           mutation_type=config["mutation_type"],
                                           crossover_type=config["crossover_type"])

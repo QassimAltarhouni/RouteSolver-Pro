@@ -1,5 +1,6 @@
 import os
 import csv
+import time
 
 from algorithms.genetic_algorithm import GeneticAlgorithmCVRP
 from algorithms.greedy_algorithm import GreedyCVRP
@@ -9,9 +10,6 @@ from cvrp_solver import CVRPData
 
 
 def read_optimal_cost(file_path):
-    """
-    Reads the optimal cost from a solution file (if exists).
-    """
     try:
         with open(file_path, 'r') as file:
             for line in file:
@@ -21,6 +19,7 @@ def read_optimal_cost(file_path):
         return None
     return None
 
+
 def main():
     DATA_FOLDER = "data"
     OPTIMAL_FOLDER = "data/optimal_data"
@@ -29,7 +28,6 @@ def main():
     os.makedirs("results", exist_ok=True)
     vrp_files = [f for f in os.listdir(DATA_FOLDER) if f.endswith(".vrp")]
 
-    # Prepare CSV output
     with open(RESULTS_CSV, mode="w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([
@@ -40,30 +38,44 @@ def main():
         ])
 
     results = []
-    for file_name in vrp_files:
+
+    for idx, file_name in enumerate(vrp_files, 1):
+        print(f"\n🔄 Processing file {idx}/{len(vrp_files)}: {file_name}")
         file_path = os.path.join(DATA_FOLDER, file_name)
         optimal_file = os.path.join(OPTIMAL_FOLDER, file_name)
         cvrp_data = CVRPData(file_path)
         optimal_cost = read_optimal_cost(optimal_file)
 
-        # Greedy (single run)
+        # Run Greedy
+        print("➡️ Running Greedy...")
+        start = time.time()
         greedy_solver = GreedyCVRP(cvrp_data)
         _, greedy_distance = greedy_solver.run()
+        print(f"✅ Greedy Done in {time.time() - start:.2f}s")
 
-        # Random Search
+        # Run Random Search
+        print("➡️ Running Random Search...")
+        start = time.time()
         random_solver = RandomSearchCVRP(cvrp_data, max_fitness_evals=5000)
         rand_stats = random_solver.run_multiple(runs=10)
+        print(f"✅ Random Search Done in {time.time() - start:.2f}s")
 
-        # Tabu Search
+        # Run Tabu Search
+        print("➡️ Running Tabu Search...")
+        start = time.time()
         tabu_solver = TabuSearchCVRP(cvrp_data, max_fitness_evals=5000)
         tabu_stats = tabu_solver.run(runs=10)
+        print(f"✅ Tabu Search Done in {time.time() - start:.2f}s")
 
-        # Genetic Algorithm
+        # Run Genetic Algorithm
+        print("➡️ Running Genetic Algorithm...")
+        start = time.time()
         ga_solver = GeneticAlgorithmCVRP(
-            cvrp_data, population_size=50, generations=1000,
+            cvrp_data, population_size=50, generations=100, #max_fitness_evals =  population_size * generations
             crossover_prob=0.8, mutation_prob=0.1
         )
         ga_stats = ga_solver.run(runs=10)
+        print(f"✅ GA Done in {time.time() - start:.2f}s")
 
         results.append({
             "file": file_name,
@@ -83,8 +95,7 @@ def main():
             "ga_std": ga_stats["std"]
         })
 
-    # Print results table
-    print("\n========== FINAL RESULTS ==========")
+    print("\n📝 Writing Results Table...")
     header = ("{:<15}{:<10}{:<10}{:<12}{:<12}{:<12}{:<12}"
               "{:<12}{:<12}{:<12}{:<12}"
               "{:<12}{:<12}{:<12}{:<12}")
@@ -102,7 +113,8 @@ def main():
             f"{r['tabu_best']:.2f}", f"{r['tabu_worst']:.2f}", f"{r['tabu_avg']:.2f}", f"{r['tabu_std']:.2f}",
             f"{r['ga_best']:.2f}", f"{r['ga_worst']:.2f}", f"{r['ga_avg']:.2f}", f"{r['ga_std']:.2f}"
         ))
-    # Append results to CSV
+
+    # Save results to CSV
     with open(RESULTS_CSV, mode="a", newline="") as file:
         writer = csv.writer(file)
         for r in results:
@@ -112,6 +124,8 @@ def main():
                 r["tabu_best"], r["tabu_worst"], r["tabu_avg"], r["tabu_std"],
                 r["ga_best"], r["ga_worst"], r["ga_avg"], r["ga_std"]
             ])
+
+    print("\n✅ All files processed and results saved!")
 
 if __name__ == "__main__":
     main()
