@@ -5,7 +5,7 @@ class GeneticAlgorithmCVRP:
     """
     Genetic Algorithm for CVRP: evolves a population of routes with crossover and mutation.
     """
-    def __init__(self, cvrp_data, population_size=30, generations=100,
+    def __init__(self, cvrp_data, population_size=50, generations=100,
                  crossover_prob=0.7, mutation_prob=0.1,
                  mutation_type="swap", crossover_type="OX"):
         """

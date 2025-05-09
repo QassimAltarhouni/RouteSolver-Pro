@@ -5,16 +5,16 @@ class TabuSearchCVRP:
     """
     Tabu Search algorithm for CVRP: improves routes using a tabu list to escape local minima.
     """
-    def __init__(self, cvrp_data, tabu_tenure=10, max_iterations=100):
+    def __init__(self, cvrp_data, tabu_tenure=10, max_fitness_evals=5000):
         """
         Initialize Tabu Search parameters.
         :param cvrp_data: An instance of CVRPData.
         :param tabu_tenure: Number of moves to keep in tabu list.
-        :param max_iterations: Max number of iterations per run.
+        :param max_fitness_evals: Max number of iterations per run.
         """
         self.cvrp = cvrp_data
         self.tabu_tenure = tabu_tenure
-        self.max_iterations = max_iterations
+        self.max_fitness_evals = max_fitness_evals
 
     def evaluate_route(self, route):
         """
@@ -72,7 +72,7 @@ class TabuSearchCVRP:
             best_cost = self.evaluate_route(best_solution)
             tabu_list = []
 
-            for _ in range(self.max_iterations):
+            for _ in range(self.max_fitness_evals):
                 neighbors = self.generate_neighbors(current_solution)
                 # sort neighbors by distance (ascending)
                 neighbors.sort(key=lambda x: self.evaluate_route(x[2]))

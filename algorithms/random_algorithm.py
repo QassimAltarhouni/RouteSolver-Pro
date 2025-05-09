@@ -8,14 +8,14 @@ class RandomSearchCVRP:
     """
     Random Search algorithm for CVRP: generates random routes and reports statistics.
     """
-    def __init__(self, cvrp_data, num_iterations=1000):
+    def __init__(self, cvrp_data, max_fitness_evals=5000):
         """
         Initialize the Random Search algorithm.
         :param cvrp_data: An instance of CVRPData.
         :param num_iterations: Number of random routes to generate.
         """
         self.cvrp = cvrp_data
-        self.num_iterations = num_iterations
+        self.max_fitness_evals = max_fitness_evals
 
     def evaluate_route(self, route):
         """
@@ -42,26 +42,27 @@ class RandomSearchCVRP:
         total_distance += self.cvrp.distance_matrix[prev_location][1]
         return total_distance
 
-    def run(self):
+    def run_multiple(self, runs=10):
         """
-        Execute random search to find feasible routes and return stats.
-        :return: Dictionary with 'best', 'worst', 'avg', 'std' distances.
+        Run the random search multiple times and return aggregated stats.
         """
-        distances = []
-        customer_ids = list(self.cvrp.locations.keys())[1:]  # exclude depot
+        best_costs = []
+        for _ in range(runs):
+            distances = []
+            customer_ids = list(self.cvrp.locations.keys())[1:]
+            for _ in range(self.max_fitness_evals):
+                route = customer_ids.copy()
+                random.shuffle(route)
+                dist = self.evaluate_route(route)
+                distances.append(dist)
+            best_costs.append(min(distances))
 
-        for _ in range(self.num_iterations):
-            random_route = customer_ids.copy()
-            random.shuffle(random_route)
-            dist = self.evaluate_route(random_route)
-            distances.append(dist)
-
-        distances = np.array(distances)
+        arr = np.array(best_costs)
         return {
-            "best": float(np.min(distances)),
-            "worst": float(np.max(distances)),
-            "avg": float(np.mean(distances)),
-            "std": float(np.std(distances))
+            "best": float(arr.min()),
+            "worst": float(arr.max()),
+            "avg": float(arr.mean()),
+            "std": float(arr.std())
         }
 
 
