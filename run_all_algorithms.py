@@ -51,16 +51,16 @@ def main():
         _, greedy_distance = greedy_solver.run()
 
         # Random Search
-        random_solver = RandomSearchCVRP(cvrp_data, max_fitness_evals=5000)
+        random_solver = RandomSearchCVRP(cvrp_data, max_fitness_evals=500)
         rand_stats = random_solver.run_multiple(runs=10)
 
         # Tabu Search
-        tabu_solver = TabuSearchCVRP(cvrp_data, max_fitness_evals=5000)
+        tabu_solver = TabuSearchCVRP(cvrp_data, max_fitness_evals=500)
         tabu_stats = tabu_solver.run(runs=10)
 
         # Genetic Algorithm
         ga_solver = GeneticAlgorithmCVRP(
-            cvrp_data, population_size=50, generations=1000,
+            cvrp_data, population_size=50, generations=100,
             crossover_prob=0.8, mutation_prob=0.1
         )
         ga_stats = ga_solver.run(runs=10)
