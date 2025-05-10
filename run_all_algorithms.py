@@ -83,9 +83,9 @@ def main():
         with open("results/best_routes.txt", "a", encoding="utf-8") as f:
             f.write(f"\n📁 File: {file_name}\n")
             f.write(f"Greedy Best Cost: {greedy_distance:.2f}\nRoutes: {greedy_routes}\n")
-            f.write(f"Random Best Cost: {rand_stats['best']:.2f}\nRoute: {rand_stats['route']}\n")
-            f.write(f"Tabu Best Cost: {tabu_stats['best']:.2f}\nRoute: {tabu_stats['route']}\n")
-            f.write(f"GA Best Cost: {ga_stats['best']:.2f}\nRoute: {ga_stats['route']}\n")
+            f.write(f"Random Best Cost: {rand_stats['best']:.2f}\nRoutes: {rand_stats['split_routes']}\n")
+            f.write(f"Tabu Best Cost: {tabu_stats['best']:.2f}\nRoutes: {tabu_stats['split_routes']}\n")
+            f.write(f"GA Best Cost: {ga_stats['best']:.2f}\nRoutes: {ga_stats['split_routes']}\n")
             f.write("---------------------------------------------------\n")
 
         results.append({

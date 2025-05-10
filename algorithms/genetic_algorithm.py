@@ -129,6 +129,6 @@ class GeneticAlgorithmCVRP:
             "worst": float(arr.max()),
             "avg": float(arr.mean()),
             "std": float(arr.std()),
-            "route": best_route,
+
             "split_routes": self.split_into_routes(best_route)
         }

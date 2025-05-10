@@ -117,6 +117,5 @@ class TabuSearchCVRP:
             "worst": float(arr.max()),
             "avg": float(arr.mean()),
             "std": float(arr.std()),
-            "route": best_solution,
             "split_routes": self.split_into_routes(best_solution)
         }
