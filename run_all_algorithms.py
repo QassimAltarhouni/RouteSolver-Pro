@@ -28,6 +28,11 @@ def main():
     os.makedirs("results", exist_ok=True)
     vrp_files = [f for f in os.listdir(DATA_FOLDER) if f.endswith(".vrp")]
 
+    # ✅ Overwrite best_routes.txt ONCE at the start
+    with open("results/best_routes.txt", "w", encoding="utf-8") as f:
+        f.write("🆕 Best Routes per File\n")
+        f.write("=" * 50 + "\n")
+
     with open(RESULTS_CSV, mode="w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([
@@ -50,9 +55,7 @@ def main():
         print("➡️ Running Greedy...")
         start = time.time()
         greedy_solver = GreedyCVRP(cvrp_data)
-
         greedy_routes, greedy_distance = greedy_solver.run()
-
         print(f"✅ Greedy Done in {time.time() - start:.2f}s")
 
         # Run Random Search
@@ -66,7 +69,6 @@ def main():
         print("➡️ Running Tabu Search...")
         start = time.time()
         tabu_solver = TabuSearchCVRP(cvrp_data, max_iterations=100, neighbor_sample_size=50)
-        # max_fitness_evals =  max_iterations * neighbor_sample_size
         tabu_stats = tabu_solver.run(runs=10)
         print(f"✅ Tabu Search Done in {time.time() - start:.2f}s")
 
@@ -74,12 +76,13 @@ def main():
         print("➡️ Running Genetic Algorithm...")
         start = time.time()
         ga_solver = GeneticAlgorithmCVRP(
-            cvrp_data, population_size=50, generations=100, #max_fitness_evals =  population_size * generations
+            cvrp_data, population_size=50, generations=100,
             crossover_prob=0.8, mutation_prob=0.1
         )
         ga_stats = ga_solver.run(runs=10)
         print(f"✅ GA Done in {time.time() - start:.2f}s")
-        # ✅ Save best routes for THIS file
+
+        # ✅ Append current file's results to best_routes.txt
         with open("results/best_routes.txt", "a", encoding="utf-8") as f:
             f.write(f"\n📁 File: {file_name}\n")
             f.write(f"Greedy Best Cost: {greedy_distance:.2f}\nRoutes: {greedy_routes}\n")
