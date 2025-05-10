@@ -8,16 +8,6 @@ class GeneticAlgorithmCVRP:
     def __init__(self, cvrp_data, population_size=50, generations=100,
                  crossover_prob=0.7, mutation_prob=0.1,
                  mutation_type="swap", crossover_type="OX"):
-        """
-        Initialize GA parameters.
-        :param cvrp_data: An instance of CVRPData.
-        :param population_size: Number of individuals.
-        :param generations: Number of generations (iterations).
-        :param crossover_prob: Probability of crossover.
-        :param mutation_prob: Probability of mutation.
-        :param mutation_type: Mutation strategy ("swap" or "inversion").
-        :param crossover_type: Crossover strategy ("OX", "PMX", etc.).
-        """
         self.cvrp = cvrp_data
         self.population_size = population_size
         self.generations = generations
@@ -27,12 +17,9 @@ class GeneticAlgorithmCVRP:
         self.crossover_type = crossover_type
 
     def evaluate_route(self, route):
-        """
-        Calculate total distance of a CVRP route.
-        """
         total_distance = 0.0
         current_capacity = 0
-        prev_location = 1  # start at depot
+        prev_location = 1  # depot
 
         for customer in route:
             demand = self.cvrp.demands[customer]
@@ -45,14 +32,31 @@ class GeneticAlgorithmCVRP:
             prev_location = customer
             current_capacity += demand
 
-        total_distance += self.cvrp.distance_matrix[prev_location][1]  # return to depot
+        total_distance += self.cvrp.distance_matrix[prev_location][1]
         return total_distance
 
+    def split_into_routes(self, flat_route):
+        routes = []
+        route = [1]
+        current_capacity = 0
+
+        for customer in flat_route:
+            demand = self.cvrp.demands[customer]
+            if current_capacity + demand > self.cvrp.capacity:
+                route.append(1)
+                routes.append(route)
+                route = [1, customer]
+                current_capacity = demand
+            else:
+                route.append(customer)
+                current_capacity += demand
+
+        route.append(1)
+        routes.append(route)
+        return routes
+
     def initialize_population(self):
-        """
-        Generate initial random population of routes.
-        """
-        customer_ids = list(self.cvrp.locations.keys())[1:]  # exclude depot
+        customer_ids = list(self.cvrp.locations.keys())[1:]
         population = []
         for _ in range(self.population_size):
             individual = customer_ids.copy()
@@ -61,17 +65,11 @@ class GeneticAlgorithmCVRP:
         return population
 
     def tournament_selection(self, population, fitnesses, tournament_size=2):
-        """
-        Select an individual via tournament selection.
-        """
         participants = random.sample(list(zip(population, fitnesses)), tournament_size)
-        participants.sort(key=lambda x: x[1])  # sort by distance
+        participants.sort(key=lambda x: x[1])
         return participants[0][0]
 
     def crossover(self, parent1, parent2):
-        """
-        Perform Order Crossover (OX).  If no crossover, returns parent copy.
-        """
         if random.random() > self.crossover_prob:
             return parent1.copy()
 
@@ -88,21 +86,15 @@ class GeneticAlgorithmCVRP:
         return child
 
     def mutate(self, individual):
-        """
-        Perform swap mutation on an individual route.
-        """
         if random.random() < self.mutation_prob:
             i, j = random.sample(range(len(individual)), 2)
             individual[i], individual[j] = individual[j], individual[i]
 
     def run(self, runs=1):
-        """
-        Execute the GA and return distance stats.
-        :param runs: Number of independent runs.
-        :return: Dict with 'best', 'worst', 'avg', 'std' of best distances found.
-        """
-        sample_counter = 0  # Initialize the counter
+        sample_counter = 0
         best_costs = []
+        best_route = None
+
         for _ in range(runs):
             population = self.initialize_population()
             best_individual = min(population, key=self.evaluate_route)
@@ -118,14 +110,18 @@ class GeneticAlgorithmCVRP:
                     self.mutate(child)
                     new_population.append(child)
                 population = new_population
+
                 current_best = min(population, key=self.evaluate_route)
                 current_cost = self.evaluate_route(current_best)
-                sample_counter += len(population)  # evaluate current best
+                sample_counter += len(population)
+
                 if current_cost < best_cost:
                     best_cost = current_cost
+                    best_individual = current_best
 
             best_costs.append(best_cost)
-            best_overall_route = current_best.copy()
+            best_route = best_individual.copy()
+
         print(f"Total samples evaluated: {sample_counter}")
         arr = np.array(best_costs)
         return {
@@ -133,5 +129,6 @@ class GeneticAlgorithmCVRP:
             "worst": float(arr.max()),
             "avg": float(arr.mean()),
             "std": float(arr.std()),
-            "route": best_overall_route
+            "route": best_route,
+            "split_routes": self.split_into_routes(best_route)
         }

@@ -1,27 +1,15 @@
 import random
 import numpy as np
 
-from cvrp_solver import cvrp
-
-
 class RandomSearchCVRP:
     """
     Random Search algorithm for CVRP: generates random routes and reports statistics.
     """
     def __init__(self, cvrp_data, max_fitness_evals=5000):
-        """
-        Initialize the Random Search algorithm.
-        :param cvrp_data: An instance of CVRPData.
-        :param num_iterations: Number of random routes to generate.
-        """
         self.cvrp = cvrp_data
         self.max_fitness_evals = max_fitness_evals
 
     def evaluate_route(self, route):
-        """
-        Calculate total distance of a given route sequence.
-        :param route: List of customer node IDs (in visit order).
-        """
         total_distance = 0.0
         current_capacity = 0
         prev_location = 1  # Start at depot
@@ -29,7 +17,6 @@ class RandomSearchCVRP:
         for customer in route:
             demand = self.cvrp.demands[customer]
             if current_capacity + demand > self.cvrp.capacity:
-                # Return to depot due to capacity limit
                 total_distance += self.cvrp.distance_matrix[prev_location][1]
                 prev_location = 1
                 current_capacity = 0
@@ -38,26 +25,51 @@ class RandomSearchCVRP:
             prev_location = customer
             current_capacity += demand
 
-        # Return to depot after last customer
         total_distance += self.cvrp.distance_matrix[prev_location][1]
         return total_distance
 
+    def split_into_routes(self, flat_route):
+        routes = []
+        route = [1]
+        current_capacity = 0
+
+        for customer in flat_route:
+            demand = self.cvrp.demands[customer]
+            if current_capacity + demand > self.cvrp.capacity:
+                route.append(1)
+                routes.append(route)
+                route = [1, customer]
+                current_capacity = demand
+            else:
+                route.append(customer)
+                current_capacity += demand
+
+        route.append(1)
+        routes.append(route)
+        return routes
+
     def run_multiple(self, runs=10):
-        """
-        Run the random search multiple times and return aggregated stats.
-        """
         best_costs = []
+        best_overall_route = None
+
+        customer_ids = list(self.cvrp.locations.keys())[1:]
+
         for _ in range(runs):
-            distances = []
-            customer_ids = list(self.cvrp.locations.keys())[1:]
+            best_cost = float("inf")
+            best_route = None
+
             for _ in range(self.max_fitness_evals):
                 route = customer_ids.copy()
                 random.shuffle(route)
                 dist = self.evaluate_route(route)
-                distances.append(dist)
-            best_costs.append(min(distances))
-            best_route = route.copy()
 
+                if dist < best_cost:
+                    best_cost = dist
+                    best_route = route.copy()
+
+            best_costs.append(best_cost)
+            if best_overall_route is None or best_cost < self.evaluate_route(best_overall_route):
+                best_overall_route = best_route
 
         arr = np.array(best_costs)
         return {
@@ -65,20 +77,6 @@ class RandomSearchCVRP:
             "worst": float(arr.max()),
             "avg": float(arr.mean()),
             "std": float(arr.std()),
-            "route": best_route
+            "route": best_overall_route,
+            "split_routes": self.split_into_routes(best_overall_route)
         }
-
-
-# Run Random Search
-
-# Print results
-# print("\n🎲 Random Search Results:")
-# print(f"✅ Best Distance: {best_random_distance:.2f}")
-#print(f"❌ Worst Distance: {worst_random_distance:.2f}")
-#print(f"📊 Average Distance: {avg_random_distance:.2f}")
-#print(f"📉 Standard Deviation: {std_random_distance:.2f}")
-#print(f"🔀 Best Random Route: {best_random_route}")
-
-
-
-

@@ -13,7 +13,7 @@ class TabuSearchCVRP:
         self.max_iterations = max_iterations
         self.neighbor_sample_size = neighbor_sample_size
 
-    def evaluate_route(self, route): # while cnt < max_fitness_evals
+    def evaluate_route(self, route):
         total_distance = 0.0
         current_capacity = 0
         prev_location = 1  # Start at depot
@@ -32,6 +32,26 @@ class TabuSearchCVRP:
         total_distance += self.cvrp.distance_matrix[prev_location][1]
         return total_distance
 
+    def split_into_routes(self, flat_route):
+        routes = []
+        route = [1]
+        current_capacity = 0
+
+        for customer in flat_route:
+            demand = self.cvrp.demands[customer]
+            if current_capacity + demand > self.cvrp.capacity:
+                route.append(1)
+                routes.append(route)
+                route = [1, customer]
+                current_capacity = demand
+            else:
+                route.append(customer)
+                current_capacity += demand
+
+        route.append(1)
+        routes.append(route)
+        return routes
+
     def generate_neighbors(self, route):
         neighbors = []
         n = len(route)
@@ -43,10 +63,11 @@ class TabuSearchCVRP:
         return neighbors
 
     def run(self, runs=1):
-        global best_solution
         best_costs = []
+        best_solution = None
         customer_ids = list(self.cvrp.locations.keys())[1:]  # exclude depot
         sample_counter = 0
+
         for _ in range(runs):
             current_solution = customer_ids.copy()
             random.shuffle(current_solution)
@@ -58,21 +79,18 @@ class TabuSearchCVRP:
 
             for _ in range(self.max_iterations):
                 neighbors = self.generate_neighbors(current_solution)
-                # Sample a limited number of neighbors
                 sampled_neighbors = random.sample(
                     neighbors,
                     min(self.neighbor_sample_size, len(neighbors))
                 )
 
-                # Evaluate and get the best one using heapq (faster than sort)
                 neighbor_evals = [
                     (i, j, neighbor, self.evaluate_route(neighbor))
-
                     for i, j, neighbor in sampled_neighbors
                 ]
                 sample_counter += len(sampled_neighbors)
-                top_neighbors = heapq.nsmallest(1, neighbor_evals, key=lambda x: x[3])
 
+                top_neighbors = heapq.nsmallest(1, neighbor_evals, key=lambda x: x[3])
                 if not top_neighbors:
                     continue
 
@@ -99,5 +117,6 @@ class TabuSearchCVRP:
             "worst": float(arr.max()),
             "avg": float(arr.mean()),
             "std": float(arr.std()),
-            "route": best_solution
+            "route": best_solution,
+            "split_routes": self.split_into_routes(best_solution)
         }
