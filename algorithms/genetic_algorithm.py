@@ -101,6 +101,7 @@ class GeneticAlgorithmCVRP:
         :param runs: Number of independent runs.
         :return: Dict with 'best', 'worst', 'avg', 'std' of best distances found.
         """
+        sample_counter = 0  # Initialize the counter
         best_costs = []
         for _ in range(runs):
             population = self.initialize_population()
@@ -119,15 +120,18 @@ class GeneticAlgorithmCVRP:
                 population = new_population
                 current_best = min(population, key=self.evaluate_route)
                 current_cost = self.evaluate_route(current_best)
+                sample_counter += len(population)  # evaluate current best
                 if current_cost < best_cost:
                     best_cost = current_cost
 
             best_costs.append(best_cost)
-
+            best_overall_route = current_best.copy()
+        print(f"Total samples evaluated: {sample_counter}")
         arr = np.array(best_costs)
         return {
             "best": float(arr.min()),
             "worst": float(arr.max()),
             "avg": float(arr.mean()),
-            "std": float(arr.std())
+            "std": float(arr.std()),
+            "route": best_overall_route
         }

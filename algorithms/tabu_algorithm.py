@@ -7,13 +7,13 @@ class TabuSearchCVRP:
     """
     Tabu Search algorithm for CVRP: improves routes using a tabu list to escape local minima.
     """
-    def __init__(self, cvrp_data, tabu_tenure=10, max_fitness_evals=5000, neighbor_sample_size=100):
+    def __init__(self, cvrp_data, tabu_tenure=10, max_iterations=5000, neighbor_sample_size=100):
         self.cvrp = cvrp_data
         self.tabu_tenure = tabu_tenure
-        self.max_fitness_evals = max_fitness_evals
+        self.max_iterations = max_iterations
         self.neighbor_sample_size = neighbor_sample_size
 
-    def evaluate_route(self, route):
+    def evaluate_route(self, route): # while cnt < max_fitness_evals
         total_distance = 0.0
         current_capacity = 0
         prev_location = 1  # Start at depot
@@ -43,9 +43,10 @@ class TabuSearchCVRP:
         return neighbors
 
     def run(self, runs=1):
+        global best_solution
         best_costs = []
         customer_ids = list(self.cvrp.locations.keys())[1:]  # exclude depot
-
+        sample_counter = 0
         for _ in range(runs):
             current_solution = customer_ids.copy()
             random.shuffle(current_solution)
@@ -55,7 +56,7 @@ class TabuSearchCVRP:
             tabu_queue = deque()
             tabu_set = set()
 
-            for _ in range(self.max_fitness_evals):
+            for _ in range(self.max_iterations):
                 neighbors = self.generate_neighbors(current_solution)
                 # Sample a limited number of neighbors
                 sampled_neighbors = random.sample(
@@ -66,8 +67,10 @@ class TabuSearchCVRP:
                 # Evaluate and get the best one using heapq (faster than sort)
                 neighbor_evals = [
                     (i, j, neighbor, self.evaluate_route(neighbor))
+
                     for i, j, neighbor in sampled_neighbors
                 ]
+                sample_counter += len(sampled_neighbors)
                 top_neighbors = heapq.nsmallest(1, neighbor_evals, key=lambda x: x[3])
 
                 if not top_neighbors:
@@ -90,9 +93,11 @@ class TabuSearchCVRP:
             best_costs.append(best_cost)
 
         arr = np.array(best_costs)
+        print(f"Total samples evaluated: {sample_counter}")
         return {
             "best": float(arr.min()),
             "worst": float(arr.max()),
             "avg": float(arr.mean()),
-            "std": float(arr.std())
+            "std": float(arr.std()),
+            "route": best_solution
         }

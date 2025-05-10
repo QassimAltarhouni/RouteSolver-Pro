@@ -50,7 +50,9 @@ def main():
         print("➡️ Running Greedy...")
         start = time.time()
         greedy_solver = GreedyCVRP(cvrp_data)
-        _, greedy_distance = greedy_solver.run()
+
+        greedy_routes, greedy_distance = greedy_solver.run()
+
         print(f"✅ Greedy Done in {time.time() - start:.2f}s")
 
         # Run Random Search
@@ -63,7 +65,8 @@ def main():
         # Run Tabu Search
         print("➡️ Running Tabu Search...")
         start = time.time()
-        tabu_solver = TabuSearchCVRP(cvrp_data, max_fitness_evals=5000)
+        tabu_solver = TabuSearchCVRP(cvrp_data, max_iterations=100, neighbor_sample_size=50)
+        # max_fitness_evals =  max_iterations * neighbor_sample_size
         tabu_stats = tabu_solver.run(runs=10)
         print(f"✅ Tabu Search Done in {time.time() - start:.2f}s")
 
@@ -76,6 +79,14 @@ def main():
         )
         ga_stats = ga_solver.run(runs=10)
         print(f"✅ GA Done in {time.time() - start:.2f}s")
+        # ✅ Save best routes for THIS file
+        with open("results/best_routes.txt", "a", encoding="utf-8") as f:
+            f.write(f"\n📁 File: {file_name}\n")
+            f.write(f"Greedy Best Cost: {greedy_distance:.2f}\nRoutes: {greedy_routes}\n")
+            f.write(f"Random Best Cost: {rand_stats['best']:.2f}\nRoute: {rand_stats['route']}\n")
+            f.write(f"Tabu Best Cost: {tabu_stats['best']:.2f}\nRoute: {tabu_stats['route']}\n")
+            f.write(f"GA Best Cost: {ga_stats['best']:.2f}\nRoute: {ga_stats['route']}\n")
+            f.write("---------------------------------------------------\n")
 
         results.append({
             "file": file_name,
@@ -126,6 +137,7 @@ def main():
             ])
 
     print("\n✅ All files processed and results saved!")
+
 
 if __name__ == "__main__":
     main()

@@ -56,13 +56,16 @@ class RandomSearchCVRP:
                 dist = self.evaluate_route(route)
                 distances.append(dist)
             best_costs.append(min(distances))
+            best_route = route.copy()
+
 
         arr = np.array(best_costs)
         return {
             "best": float(arr.min()),
             "worst": float(arr.max()),
             "avg": float(arr.mean()),
-            "std": float(arr.std())
+            "std": float(arr.std()),
+            "route": best_route
         }
 
 
