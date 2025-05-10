@@ -110,7 +110,6 @@ class GeneticAlgorithmCVRP:
                     self.mutate(child)
                     new_population.append(child)
                 population = new_population
-
                 current_best = min(population, key=self.evaluate_route)
                 current_cost = self.evaluate_route(current_best)
                 sample_counter += len(population)

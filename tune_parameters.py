@@ -39,9 +39,9 @@ def main():
 
         # Step 1: Tune Population Size
         step1_configs = [
-            {"population_size": 30, "generations": 50000, "mutation_type": "swap", "crossover_type": "OX"},
-            {"population_size": 50, "generations": 30000, "mutation_type": "swap", "crossover_type": "OX"},
-            {"population_size": 100, "generations": 15000, "mutation_type": "swap", "crossover_type": "OX"}
+            {"population_size": 30, "generations": 5000, "mutation_type": "swap", "crossover_type": "OX"},
+            {"population_size": 50, "generations": 3000, "mutation_type": "swap", "crossover_type": "OX"},
+            {"population_size": 100, "generations": 1500, "mutation_type": "swap", "crossover_type": "OX"}
         ]
         step = 1
         best_config = None
@@ -50,6 +50,7 @@ def main():
         for config in step1_configs:
             solver = GeneticAlgorithmCVRP(cvrp_data,
                                           population_size=config["population_size"],
+                                          generations=config["generations"],
                                           crossover_prob=0.7,
                                           mutation_prob=0.1,
                                           mutation_type=config["mutation_type"],
@@ -79,6 +80,7 @@ def main():
         for config in step2_configs:
             solver = GeneticAlgorithmCVRP(cvrp_data,
                                           population_size=config["population_size"],
+                                          generations=config["generations"],
                                           crossover_prob=0.8,
                                           mutation_prob=0.1,
                                           mutation_type=config["mutation_type"],
@@ -108,6 +110,7 @@ def main():
         for config in step3_configs:
             solver = GeneticAlgorithmCVRP(cvrp_data,
                                           population_size=config["population_size"],
+                                          generations=config["generations"],
                                           crossover_prob=0.8,
                                           mutation_prob=0.1,
                                           mutation_type=config["mutation_type"],

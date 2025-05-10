@@ -77,7 +77,7 @@ def main():
         start = time.time()
         ga_solver = GeneticAlgorithmCVRP(
             cvrp_data, population_size=50, generations=100,
-            crossover_prob=0.8, mutation_prob=0.1
+            crossover_prob=0.9, mutation_prob=0.1
         )
         ga_stats = ga_solver.run(runs=10)
         print(f"✅ GA Done in {time.time() - start:.2f}s")

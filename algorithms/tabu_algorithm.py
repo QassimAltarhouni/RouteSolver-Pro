@@ -7,7 +7,7 @@ class TabuSearchCVRP:
     """
     Tabu Search algorithm for CVRP: improves routes using a tabu list to escape local minima.
     """
-    def __init__(self, cvrp_data, tabu_tenure=10, max_iterations=5000, neighbor_sample_size=100):
+    def __init__(self, cvrp_data, tabu_tenure=15, max_iterations=5000, neighbor_sample_size=100):
         self.cvrp = cvrp_data
         self.tabu_tenure = tabu_tenure
         self.max_iterations = max_iterations
