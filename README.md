@@ -1,29 +1,45 @@
-📦 Project Name (RouteSolver Pro)
-A modern and efficient Capacitated Vehicle Routing Problem (CVRP) solver built for scalable logistics optimization.
-Whether you manage a small fleet or coordinate large-scale delivery operations, RouteSolver Pro provides fast, cost-effective routing solutions.
+# 📦 RouteSolver Pro
 
-🚀 Key Features
-Flexible input for fleets and customers
+A modern and efficient **Capacitated Vehicle Routing Problem (CVRP)** solver built for scalable logistics optimization.  
 
-Distance and capacity constraints built-in
+Whether you manage a **small fleet** or coordinate **large-scale delivery operations**, RouteSolver Pro delivers **fast, cost-effective** routing solutions.
 
-Modular design: easy to customize for advanced heuristics or metaheuristics
+---
 
-Extensible: plug in new solver strategies without rewriting core components
+## 🚀 Key Features
+- **Flexible Input** — Works with various fleet and customer configurations.  
+- **Built-in Constraints** — Supports distance and capacity restrictions out of the box.  
+- **Modular Design** — Easily integrate advanced heuristics or metaheuristics.  
+- **Extensible Architecture** — Add new solver strategies without changing the core system.  
+- **Visualization Support** *(optional)* — Inspect and analyze generated routes.
 
-Visualization tools (optional) to inspect routes
+---
 
-⚙️ Installation
+## ⚙️ Installation
+
+```bash
 git clone https://github.com/QassimAltarhouni/RouteSolver-Pro.git
 cd route-solver-pro
 pip install -r requirements.txt
-🧠 Usage
+```
+
+---
+
+## 🧠 Usage
+
+```bash
 python solve_cvrp.py --data path/to/data.json --output output/routes.json
---data: JSON file describing customer locations, demands, and fleet information
+```
 
---output: Where to save the computed routes
+**Arguments:**
+- `--data` — Path to JSON file containing customer locations, demands, and fleet information.  
+- `--output` — Path to save the computed routes.
 
-📂 Project Structure
+---
+
+## 📂 Project Structure
+
+```
 ├── solve_cvrp.py        # CLI entry point
 ├── cvrp/
 │   ├── __init__.py
@@ -33,5 +49,17 @@ python solve_cvrp.py --data path/to/data.json --output output/routes.json
 ├── examples/
 │   └── demo.json        # Sample problem
 └── README.md
-🧪 Testing
+```
+
+---
+
+## 🧪 Testing
+
+```bash
 pytest
+```
+
+---
+
+## 📜 License
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
